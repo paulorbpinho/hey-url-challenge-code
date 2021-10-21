@@ -10,9 +10,13 @@ class UrlsController < ApplicationController
   def create
     # create a new URL record
     @url = Url.new(url_params)
+    @url.short_url = Url.next_short_url
+    @url.created_at = Time.now
+
     respond_to do |format|
       if @url.save
-        format.html { redirect_to(@url) }
+        flash[:notice] = "Url was successfully created."
+        format.html { redirect_to action: :index }
       else
         load_recent_urls
         format.html { render action: :index }
@@ -21,7 +25,7 @@ class UrlsController < ApplicationController
   end
 
   def show
-    @url = Url.new(short_url: 'ABCDE', original_url: 'http://google.com', created_at: Time.now)
+    @url = Url.find_by(short_url: params[:url])
     # implement queries
     @daily_clicks = [
       ['1', 13],
@@ -50,8 +54,11 @@ class UrlsController < ApplicationController
   end
 
   def visit
-    # params[:short_url]
-    render plain: 'redirecting to url...'
+    browser = Browser.new(request.user_agent)
+    @url = Url.find_by(short_url: params[:short_url])
+    @url.update!(clicks_count: @url.clicks_count + 1)
+    @url.clicks.create(browser: browser.name, platform: browser.platform)
+    redirect_to @url.original_url
   end
 
   private
