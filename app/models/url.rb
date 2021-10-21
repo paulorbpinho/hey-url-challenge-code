@@ -2,11 +2,19 @@
 
 class Url < ApplicationRecord
   # scope :latest, -> {}
+  validates :original_url, presence: true, url: true
+  validates :short_url, presence: true, uniqueness: true
+
+  before_validation do
+    self.short_url = Url.next_short_url
+    self.created_at = Time.now
+  end
+
   def self.next_short_url
     numeric_letters = [65,65,65,65,65]
     increment_letters = []
-    last_id = 25
-    last_id ||= self.maximum 'id'
+    last_id = Url.maximum 'id'
+    last_id ||= 0
     numeric_increment_index = 4
     while( numeric_increment_index >= 0 )
       increment = last_id / (26 ** numeric_increment_index)
