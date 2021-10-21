@@ -26,4 +26,20 @@ class Url < ApplicationRecord
     end
     numeric_letters.map { |number| number.chr }.join('')
   end
+
+  def as_json(options)
+    { type: "url", id: self.id, 
+      attributes: { 
+        "created-at": self.created_at, 
+        "original-url": self.original_url, 
+        clicks: self.clicks_count, 
+        url: "http://localhost:3000/"+self.short_url
+      },
+      relationships: {
+        clicks: {
+          data: self.clicks.map { |click| { id: click.id, type: "click" } }
+        }
+      } 
+    } 
+  end
 end
