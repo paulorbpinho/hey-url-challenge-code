@@ -34,24 +34,27 @@ class UrlsController < ApplicationController
 
   def show
     @url = Url.find_by(short_url: params[:url])
-    # implement queries
-    first_day_of_month = Date.today.at_beginning_of_month
-    last_day_of_month = Date.today.end_of_month
-    @clicks = Click.where(created_at: first_day_of_month.midnight..last_day_of_month.end_of_day)
-    @click_days = @clicks.group_by { |click| click.created_at.to_date }
-    @daily_clicks = []
-    @click_days.each do |day, clicks|
-      @daily_clicks.push([day.mday.to_s, clicks.length])
-    end
-    @browsers_clicks = []
-    @clicks_browser = @clicks.group_by { |click| click.browser }
-    @clicks_browser.each do |browser, clicks|
-      @browsers_clicks.push([browser, clicks.length])
-    end
-    @platform_clicks = []
-    @clicks_platform = @clicks.group_by { |click| click.platform }
-    @clicks_platform.each do |platform, clicks|
-      @platform_clicks.push([platform, clicks.length])
+    if @url
+      first_day_of_month = Date.today.at_beginning_of_month
+      last_day_of_month = Date.today.end_of_month
+      @clicks = Click.where(created_at: first_day_of_month.midnight..last_day_of_month.end_of_day)
+      @click_days = @clicks.group_by { |click| click.created_at.to_date }
+      @daily_clicks = []
+      @click_days.each do |day, clicks|
+        @daily_clicks.push([day.mday.to_s, clicks.length])
+      end
+      @browsers_clicks = []
+      @clicks_browser = @clicks.group_by { |click| click.browser }
+      @clicks_browser.each do |browser, clicks|
+        @browsers_clicks.push([browser, clicks.length])
+      end
+      @platform_clicks = []
+      @clicks_platform = @clicks.group_by { |click| click.platform }
+      @clicks_platform.each do |platform, clicks|
+        @platform_clicks.push([platform, clicks.length])
+      end
+    else
+      render :file => "#{Rails.root}/public/404.html", layout: false, status: :not_found
     end
   end
 

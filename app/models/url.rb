@@ -3,15 +3,16 @@
 class Url < ApplicationRecord
   # scope :latest, -> {}
   validates :original_url, presence: true, url: true
-  validates :short_url, presence: true
+  validates :short_url, presence: true, length: { is: 5 }, format: { with: /\A[A-Z]+\z/, message: "only allows uppercase letters" }
   validates :short_url, uniqueness: true, on: :create
   has_many :clicks
 
   def self.next_short_url
     numeric_letters = [65,65,65,65,65]
     increment_letters = []
-    last_id = Url.maximum('id') + 1
-    last_id ||= 0
+    last_id = Url.maximum('id')
+    last_id ||= -1
+    last_id += 1
     numeric_increment_index = 4
     while( numeric_increment_index >= 0 )
       increment = last_id / (26 ** numeric_increment_index)
