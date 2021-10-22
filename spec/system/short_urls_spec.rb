@@ -23,22 +23,23 @@ RSpec.describe 'Short Urls', type: :system do
 
   describe 'index' do
     it 'shows a list of short urls' do
+      Url.create(short_url: "ABCDE", original_url: 'http://www.google.com')
       visit root_path
-      expect(page).to have_text('HeyURL!')
-      # expect page to show 10 urls
+      expect(page).to have_text('ABCDE')
     end
   end
 
   describe 'show' do
     it 'shows a panel of stats for a given short url' do
+      Url.create(short_url: "ABCDE", original_url: 'http://www.google.com')
       visit url_path('ABCDE')
-      # expect page to show the short url
+      expect(page).to have_text('ABCDE')
     end
 
     context 'when not found' do
       it 'shows a 404 page' do
         visit url_path('NOTFOUND')
-        # expect page to be a 404
+        expect(page).to have_text('The page you were looking for doesn\'t exist.')
       end
     end
   end
@@ -47,38 +48,55 @@ RSpec.describe 'Short Urls', type: :system do
     context 'when url is valid' do
       it 'creates the short url' do
         visit '/'
-        # add more expections
+        within('#new_url') do
+          fill_in 'url_original_url', with: 'http://www.google.com'
+        end
+        click_button('Shorten URL')
+        expect(page).to have_content 'Url was successfully created.'
       end
 
       it 'redirects to the home page' do
         visit '/'
-        # add more expections
+        within('#new_url') do
+          fill_in 'url_original_url', with: 'http://www.google.com'
+        end
+        click_button('Shorten URL')
+        expect(page).to have_content 'Create a new short URL'
       end
     end
 
     context 'when url is invalid' do
       it 'does not create the short url and shows a message' do
         visit '/'
-        # add more expections
+        within('#new_url') do
+          fill_in 'url_original_url', with: 'a'
+        end
+        click_button('Shorten URL')
+        expect(page).to have_content 'Original url is not a valid URL'
       end
 
       it 'redirects to the home page' do
         visit '/'
-        # add more expections
+        within('#new_url') do
+          fill_in 'url_original_url', with: 'a'
+        end
+        click_button('Shorten URL')
+        expect(page).to have_content 'Create a new short URL'
       end
     end
   end
 
   describe 'visit' do
     it 'redirects the user to the original url' do
+      Url.create(short_url: "ABCDE", original_url: 'http://www.google.com')
       visit visit_path('ABCDE')
-      # add more expections
+      expect(page).to have_content 'Google'
     end
 
     context 'when not found' do
       it 'shows a 404 page' do
         visit visit_path('NOTFOUND')
-        # expect page to be a 404
+        expect(page).to have_text('The page you were looking for doesn\'t exist.')
       end
     end
   end

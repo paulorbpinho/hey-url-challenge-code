@@ -7,6 +7,8 @@ ruby `cat .ruby-version`.strip
 
 # https://github.com/fnando/browser
 gem 'browser'
+# Url validation
+gem 'validate_url'
 
 gem 'rubocop'
 gem 'rubocop-performance'
