@@ -35,11 +35,9 @@ class UrlsController < ApplicationController
   def show
     @url = Url.find_by(short_url: params[:url])
     if @url
-      first_day_of_month = Date.today.at_beginning_of_month
-      last_day_of_month = Date.today.end_of_month
-      @clicks = Click.where(created_at: first_day_of_month.midnight..last_day_of_month.end_of_day)
-      @click_days = @clicks.group_by { |click| click.created_at.to_date }
+      @clicks = Click.where(created_at: Date.today.at_beginning_of_month.midnight..Date.today.end_of_month.end_of_day)
       @daily_clicks = []
+      @click_days = @clicks.group_by { |click| click.created_at.to_date }
       @click_days.each do |day, clicks|
         @daily_clicks.push([day.mday.to_s, clicks.length])
       end
